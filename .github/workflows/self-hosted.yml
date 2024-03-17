@@ -3,8 +3,8 @@ name: build
 on:
  push:
    paths: ServerLaunchTrigger/self-hosted/*
- schedule:
-   - cron: '0 16/6 * * *'
+ # schedule:
+ #   - cron: '0 16/6 * * *'
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#scheduled-events
 
 
