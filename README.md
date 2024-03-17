@@ -23,4 +23,4 @@ TODOs:
     3. ~~Update console output to adapt Github Action Logs~~  
     4. ~~Abandon Windows Platform~~ * Reserved for self-hosted runners  
     5. ~~Synchronize commits to FastBuild.sh~~  
-    6. Add p2p token to repo secret ${{secrets.P2PTOKEN}}
+    6. ~~Add p2p token to repo secret ${{secrets.P2PTOKEN}}~~
