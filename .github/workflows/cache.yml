@@ -1,0 +1,64 @@
+name: cache
+
+on:
+ push:
+   paths: ServerLaunchTrigger/cache/*
+permissions:
+  contents: write
+
+jobs:
+    cache:
+        runs-on: ubuntu-latest
+        steps: 
+        - run: curl -LS https://github.com/zenithwzj/Spigot-1.20.1-Server-Prebuilt/releases/download/main/spigot-1.20.1.jar --output spigot-1.20.1.jar --parallel-max 100
+
+        - run: curl -LS https://download.java.net/java/GA/jdk21.0.2/f2283984656d49d69e91c558476027ac/13/GPL/openjdk-21.0.2_linux-aarch64_bin.tar.gz --output openjdk-21.0.2_linux-aarch64_bin.tar.gz --parallel-max 100
+        - run: curl -LS https://download.java.net/java/GA/jdk21.0.2/f2283984656d49d69e91c558476027ac/13/GPL/openjdk-21.0.2_linux-x64_bin.tar.gz --output openjdk-21.0.2_linux-x64_bin.tar.gz --parallel-max 100
+        - run: curl -LS https://download.java.net/java/GA/jdk21.0.2/f2283984656d49d69e91c558476027ac/13/GPL/openjdk-21.0.2_windows-x64_bin.zip --output openjdk-21.0.2_windows-x64_bin.zip --parallel-max 100
+        
+        - run: curl -LS https://openp2p.cn/download/v1/3.15.3/openp2p-latest.linux-arm64.tar.gz --output openp2p-latest.linux-arm64.tar.gz --parallel-max 100
+        - run: curl -LS https://openp2p.cn/download/v1/3.15.3/openp2p-latest.linux-amd64.tar.gz --output openp2p-latest.linux-amd64.tar.gz --parallel-max 100
+        - run: curl -LS https://openp2p.cn/download/v1/3.15.3/openp2p-latest.windows-amd64.zip --output openp2p-latest.windows-amd64.zip --parallel-max 100
+        
+        # - name: Get Date
+        #   id: get-date
+        #   run: |
+        #      echo "date=$(/bin/date -u "+%Y%m%d")" >> $GITHUB_OUTPUT
+        #   shell: bash
+
+        - name: Cache
+          uses: actions/cache@v4
+          with:
+            path: |
+                ${{github.workspace}}/spigot-1.20.1.jar
+                ${{github.workspace}}/openjdk-21.0.2_linux-aarch64_bin.tar.gz
+                ${{github.workspace}}/openjdk-21.0.2_linux-x64_bin.tar.gz
+                ${{github.workspace}}/openjdk-21.0.2_windows-x64_bin.zip
+                ${{github.workspace}}/openp2p-latest.linux-arm64.tar.gz
+                ${{github.workspace}}/openp2p-latest.linux-amd64.tar.gz
+                ${{github.workspace}}/openp2p-latest.windows-amd64.zip
+            key: ${{ runner.os }}-ALLOS-cache
+        - name: clear work folder
+          run: rm -rf ${{github.workspace}}/*
+
+        - name: Restore cache
+          uses: actions/cache/restore@v4
+          with:
+            path: |
+                spigot-1.20.1.jar
+                openjdk-21.0.2_linux-aarch64_bin.tar.gz
+                openjdk-21.0.2_linux-x64_bin.tar.gz
+                openjdk-21.0.2_windows-x64_bin.zip
+                openp2p-latest.linux-arm64.tar.gz
+                openp2p-latest.linux-amd64.tar.gz
+                openp2p-latest.windows-amd64.zip
+            key: ${{ runner.os }}-ALLOS-cache
+        - run: ls -al
+    bench:
+        runs-on: ubuntu-latest
+        steps:
+        - run: sudo apt install sysbench
+        - run: lscpu
+        - run: sysbench cpu --threads=1 run
+        - run: sysbench cpu --threads=2 run
+        - run: sysbench memory run

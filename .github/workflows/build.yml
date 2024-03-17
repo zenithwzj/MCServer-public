@@ -1,0 +1,145 @@
+name: build
+
+on:
+ push:
+   paths: ServerLaunchTrigger/build/*
+#  milestone: 
+#     types: [edited, created]
+ issues:
+    types: [opened, closed, reopened]
+#  schedule:
+#    - cron: '0 0/1 * * *'
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#scheduled-events
+
+permissions:
+  contents: write
+
+jobs:
+  # build:
+  #   name: WindowsRun
+  #   runs-on: windows-latest
+  #   timeout-minutes: 100
+  #   continue-on-error: true
+
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   - run: start MTcompileSleep.bat
+  #   - name: Download archive
+  #     uses: dsaltares/fetch-gh-release-asset@1.1.1
+  #     with: 
+  #       file: server.zip
+  #       target: 'archive.zip'
+  #   - name: Download openp2p config
+  #     uses: dsaltares/fetch-gh-release-asset@1.1.1
+  #     with:
+  #       file: openp2p.config.json
+  #       target: 'openp2p.config.json'
+    
+  #   - run: ${{github.workspace}}\FastBuild.bat
+
+  #   - name: upload logs
+  #     uses: actions/upload-artifact@v4
+  #     with: 
+  #       compression-level: 0
+  #       if-no-files-found: ignore
+  #       name: publicWINDOWS.logs
+  #       path: |
+  #         ${{github.workspace}}\TCPLE.log
+  #         ${{github.workspace}}\Ttimer.log
+  #         ${{github.workspace}}\openp2p.log
+
+  #   - name: upload server.zip
+  #     uses: actions/upload-artifact@v4
+  #     with: 
+  #       name: backup
+  #       path: ${{github.workspace}}\WKSPC\packwork\server.zip
+
+  #   - name: upload config.json to release
+  #     uses: svenstaro/upload-release-action@v2
+  #     with: 
+  #       file: ${{github.workspace}}\WKSPC\packwork\config.json
+  #       asset_name: openp2p.config.json
+  #       tag: "archive"
+  #       overwrite: true
+
+  #   - name: upload server.zip to release
+  #     uses: svenstaro/upload-release-action@v2
+  #     with:
+  #       file: ${{github.workspace}}\WKSPC\packwork\server.zip
+  #       asset_name: server.zip
+  #       tag: "archive"
+  #       overwrite: true
+        
+  BuildLinux: 
+    name: LinuxRun
+    runs-on: ubuntu-latest
+    # timeout-minutes: 10
+    continue-on-error: true
+
+    steps:
+    - uses: actions/checkout@v4
+    - run: sudo chmod 777 FastBuild.sh MTcompileSleep.sh
+    - run: ${{github.workspace}}/MTcompileSleep.sh
+    - name: Download archive
+      uses: dsaltares/fetch-gh-release-asset@1.1.1
+      with: 
+        file: server.zip
+        target: 'archive.zip'
+    - name: Download openp2p config
+      uses: dsaltares/fetch-gh-release-asset@1.1.1
+      with:
+        file: openp2p.config.json
+        target: 'openp2p.config.json'
+
+    - name: Restore token
+      run: ${{github.workspace}}/WriteSecret ${{secrets.P2PTOKEN}} openp2p.config.json
+
+    - run: sudo bash -c ${{github.workspace}}/FastBuild.sh ${{secrets.P2PTOKEN}}
+    - name: remove token and pack logs.gz
+      run: |
+        ${{github.workspace}}/ReplaceSecret ${{secrets.P2PTOKEN}} ${{github.workspace}}/openp2p.log 00000000000000000000 ${{github.workspace}}/Wopenp2p.log
+        tar -czf ./logs.gz ./TCPLE.log ./Ttimer.log ./Wopenp2p.log &
+    #     ${{github.workspace}}/ReplaceSecret ${{secrets.P2PTOKEN}} ${{github.workspace}}/WKSPC/packwork/config.json 00000000000000000000
+    #     ${{github.workspace}}/WriteSecret 00000000000000000000 ${{github.workspace}}/WKSPC/packwork/config.json
+
+
+    - name: upload config.json to release
+      uses: svenstaro/upload-release-action@v2
+      with: 
+        file: ${{github.workspace}}/WKSPC/packwork/config.json
+        asset_name: openp2p.config.json
+        tag: "archive"
+        overwrite: true
+    - name: upload server.zip to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        file: ${{github.workspace}}/WKSPC/packwork/server.zip
+        asset_name: server.zip
+        tag: "archive"
+        overwrite: true
+    - name: upload logs.gz to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        file: ${{github.workspace}}/logs.gz
+        asset_name: logs.gz
+        tag: "archive"
+        overwrite: true
+
+    - name: Upload logs to artifacts
+      uses: actions/upload-artifact@v4
+      with: 
+        compression-level: 0
+        if-no-files-found: warn
+        name: logs
+        path: |
+          ${{github.workspace}}/Wopenp2p.log
+          ${{github.workspace}}/TCPLE.log
+          ${{github.workspace}}/Ttimer.log
+
+    - name: Backup game archive
+      uses: actions/upload-artifact@v4
+      with: 
+        compression-level: 9
+        if-no-files-found: warn
+        name: backup
+        path: ${{github.workspace}}/WKSPC/packwork/server.zip
