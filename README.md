@@ -9,3 +9,6 @@ steps to start a server on github actions:
     5. Your account have a quota of 2,000 minutes per month to run the server. If you would like more, try [self-hosted runners](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners)! The repository currently supports **Windows X64**. **ARM64** runners can be runned on android by [termux](https://github.com/termux/termux-app#github) + [tmoe](https://gitee.com/mo2/linux/). But the script haven't yet been updated and some security issues may exist when running on public repositories. However, please feel safe to run workflows on the current [**build.yml**](https://github.com/zenithwzj/MCServer-public/blob/main/.github/workflows/build.yml) and [**self-hosted.yml**](https://github.com/zenithwzj/MCServer-public/blob/main/.github/workflows/self-hosted.yml) in your public repository, your token won't leak! 
 
 Enjoy your game! xD
+
+[1] **openp2p token** : after [**registering**](https://console.openp2p.cn/register), get it at [**openp2p console**](https://console.openp2p.cn/).  
+*Tutorial on running self-hosted runners will be uploaded later
