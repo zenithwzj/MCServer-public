@@ -1,18 +1,11 @@
-# Minecraft-server
-个人开服用
-试图利用Github Actions 6小时的timeout开mc服务器
+# MCServer-public 
+This project uses [openp2p-cn](https://github.com/openp2p-cn)/[openp2p](https://github.com/openp2p-cn/openp2p) to connect the client(s) to the server.
 
-We recommend reconnecting when facing with scheduled server reboot.
-For cpTimer.cpp, it's supposed that 2<= minTimeout <= 360 (2 means to stop immediately)
+steps to start a server on github actions:      
+    1. Fork this repository.  
+    2. Create a release on the tag 'archive', with file `server.zip` and `openp2p.config.json`, here is an [example](https://github.com/zenithwzj/MCServer-public/releases/tag/archive). You can copy them freely. The `server.zip` must include `eula.txt` ( `eula = true` ) so that the server can run.  
+    3. Under your repository name, click **Settings**. If you cannot see the "Settings" tab, select the dropdown menu, then click **Settings**. In the **Security** section of the sidebar, select **Secrets and variables**, then click **Actions**. Click the **Secrets** tab. Click **New repository secret**. In the **Name** field, type `P2PTOKEN`(case insensitive). In the **Secret** field, enter your **openp2p token**[1]. Click **Add secret**. (guide from [**Github Docs**](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions))  
+    4. Commit a change to `ServerLaunchTrigger/build/Trigger.txt` or open an issue to your repository. The [workflow](https://github.com/zenithwzj/MCServer-public/actions/workflows/build.yml) will be automaticallly runned.  
+    5. Your account have a quota of 2,000 minutes per month to run the server. If you would like more, try [self-hosted runners](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners)! The repository currently supports **Windows X64**. **ARM64** runners can be runned on android by [termux](https://github.com/termux/termux-app#github) + [tmoe](https://gitee.com/mo2/linux/). But the script haven't yet been updated and some security issues may exist when running on public repositories. However, please feel safe to run workflows on the current [**build.yml**](https://github.com/zenithwzj/MCServer-public/blob/main/.github/workflows/build.yml) and [**self-hosted.yml**](https://github.com/zenithwzj/MCServer-public/blob/main/.github/workflows/self-hosted.yml) in your public repository!  
 
-Major difference from regular script and SHOpt(Self-Hosted runners optimized) script: in SH environments with JDK21 already installed, SHopt scripts invoke java directly without downloading from openjdk to save time.  
-TODOs:  
-    1. ~~Unify src files(C++) : src/Timer.linux.cpp(now renamed cpTimer.cpp)~~  
-    2. Optimize approach to compress artifact to maximize CPU utilization.  
-        Strategy:  
-            on public servers: minimize CPU utilization , maximize network utilization  
-            on self-hosted servers: minimize network utilization , maximize CPU utilization  
-    3. ~~Update console output to adapt Github Action Logs~~  
-    4. ~~Abandon Windows Platform~~ * Reserved for self-hosted runners  
-    5. ~~Synchronize commits to FastBuild.sh~~  
-    6. ~~Add p2p token to repo secret ${{secrets.P2PTOKEN}}~~
+Enjoy your game! xD
